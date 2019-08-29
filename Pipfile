@@ -10,6 +10,9 @@ django = "*"
 djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
+psycopg2-binary = "*"
+requests = "*"
+django-environ = "*"
 
 [requires]
 python_version = "3.7"
