@@ -7,12 +7,22 @@ from trackerbalance.models import Address, BalanceHistory
 
 @app.task
 def tracker_balance_of_addresses():
+    """
+    Celery task for tracker balance of wallet addresses
+
+    :return:
+    """
     for address in Address.objects.all():
         tracker_balance_of_address.delay(address.id)
 
 
 @app.task
 def tracker_balance_of_address(address_id):
+    """
+    Celery task for tracker balance of specific wallet address
+    :param address_id:
+    :return:
+    """
     address = Address.objects.filter(id=address_id).get()
     params = {
         'password': env('WALLET_PASSWORD'),
