@@ -4,9 +4,10 @@ services:
   db:
     image: postgres:10.1-alpine
     env_file:
-      - ./bitcoinTracker/.env
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    restart: always
     ports:
       - 5432:5432
   web:
@@ -14,14 +15,42 @@ services:
     command: python /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
+    restart: always
     ports:
       - 8000:8000
     depends_on:
       - db
       - wallet
+      - rabbitmq
+  monitor:
+    build: .
+    command: python manage.py celerycam
+    restart: always
+    depends_on:
+      - worker
+  worker:
+    build: .
+    command: celery --app=bitcoinTracker.celery_app:app worker -E -B
+    restart: always
+    depends_on:
+      - web
   wallet:
     image: dockermgt/my-wallet-service
+    restart: always
     ports:
       - 8080:8080
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 15672:15672
+      - 5672:5672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_LOGIN}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbimq-data:/var/lib/rabbitmq/
+    restart: always
+
 volumes:
   postgres_data:
+  rabbimq-data:

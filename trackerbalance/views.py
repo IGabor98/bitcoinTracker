@@ -8,7 +8,7 @@ from .serializers import AddressSerializer
 
 
 @api_view(['GET'])
-def get_balance_of_addresses(request) -> Response:
+def import_addresses(request) -> Response:
     """
     Return balance of all addresses
     :param request:
@@ -69,8 +69,7 @@ def __save_address_balance_in_history(addresses):
         if address:
             BalanceHistory(balance=float(item['balance']), address=address.get()).save()
         else:
-            address = __create_address(item['address'])
-            BalanceHistory(balance=float(item['balance']), address=address).save()
+            Address(address=address).save(item['address'])
 
 
 def __create_address(address) -> Address:
