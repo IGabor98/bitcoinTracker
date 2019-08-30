@@ -35,8 +35,7 @@ def generate_new_address(request) -> Response:
     params = {'password': env('WALLET_PASSWORD')}
     data = requests.get(env('GENERATING_NEW_ADDRESS'), params=params).json()
 
-    address = Address(address=data['address'])
-    address.save()
+    Address.objects.create(address=data['address'])
 
     return Response(data)
 
