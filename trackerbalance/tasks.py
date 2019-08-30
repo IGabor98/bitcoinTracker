@@ -22,4 +22,4 @@ def tracker_balance_of_address(address_id):
 
     if response.status_code == 200:
         data = response.json()
-        BalanceHistory(balance=float(data['balance']), address=address).save()
+        BalanceHistory.objects.create(balance=float(data['balance']), address=address)

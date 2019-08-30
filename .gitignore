@@ -1,2 +1,4 @@
 .idea
 .env
+celerybeat-schedule
+celeryev.pid

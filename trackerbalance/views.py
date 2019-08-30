@@ -3,21 +3,23 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from bitcoinTracker.settings import env
-from .models import Address, BalanceHistory
+from .models import Address
 from .serializers import AddressSerializer
 
 
 @api_view(['GET'])
-def import_addresses(request) -> Response:
+def sync_addresses_with_wallet(request) -> Response:
     """
-    Return balance of all addresses
+    Sync addresses with wallet
+
     :param request:
     :return response:
     """
 
     params = {'password': env('WALLET_PASSWORD')}
     addresses = requests.get(env('GET_BALANCE_ADDRESSES'), params=params).json()
-    __save_address_balance_in_history(addresses)
+    __create_addresses(addresses)
+
     return Response(addresses)
 
 
@@ -57,29 +59,14 @@ def get_address_balance_history(request, address) -> Response:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-def __save_address_balance_in_history(addresses):
+def __create_addresses(addresses):
     """
-    Save address balance in history
+    Create many addresses
 
     :param addresses:
     """
 
     for item in addresses['addresses']:
-        address = Address.objects.filter(address=item['address'])
-        if address:
-            BalanceHistory(balance=float(item['balance']), address=address.get()).save()
-        else:
-            Address(address=address).save(item['address'])
-
-
-def __create_address(address) -> Address:
-    """
-    Create address
-
-    :param string address:
-    :return: new address instance
-    """
-    address = Address(address=address)
-    address.save()
-
-    return address
+        exist = Address.objects.filter(address=item['address'])
+        if not exist:
+            Address.objects.create(address=item['address'])
