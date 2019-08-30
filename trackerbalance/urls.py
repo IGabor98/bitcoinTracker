@@ -3,7 +3,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('generate-address/', get_balance_of_addresses),
-    path('get-balance-of-addresses/', get_balance_of_addresses),
+    path('sync-addresses-with-wallet/', sync_addresses_with_wallet),
+    path('generate-address/', generate_new_address),
     path('get-address-history/<str:address>', get_address_balance_history),
 ]

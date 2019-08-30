@@ -1,5 +1,5 @@
 # Pull base image
-FROM python:3.7-slim
+FROM python:3.6-slim
 
 # Set environment varibles
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /code
 
 # Install dependencies
-RUN pip install pipenv
-COPY ./Pipfile* /code/
-RUN pipenv install --system
+COPY ./ /code/
+
+RUN pip install pipenv \
+    && pipenv install --system

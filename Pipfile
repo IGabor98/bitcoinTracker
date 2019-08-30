@@ -13,6 +13,8 @@ django-filter = "*"
 psycopg2-binary = "*"
 requests = "*"
 django-environ = "*"
+celery = "*"
+django-celery = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"

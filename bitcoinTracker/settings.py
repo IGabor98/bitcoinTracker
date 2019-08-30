@@ -18,10 +18,10 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 # reading .env file
-environ.Env.read_env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+
+    #celery
+    'djcelery',
 
     'trackerbalance',
 ]
@@ -129,3 +132,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Celery
+from datetime import timedelta
+
+import djcelery
+
+djcelery.setup_loader()
+
+CELERY_RESULT_BACKEND = 'djcelery.backends.database.DatabaseBackend'
+CELERY_TASK_RESULT_EXPIRES = 1800  # 5 hours
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+BROKER_URL = 'amqp://{}:{}@rabbitmq'.format(env('RABBITMQ_LOGIN'), env('RABBITMQ_PASSWORD'))
+
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+CELERYBEAT_SCHEDULE = {
+    'tracker-addresses-every-1-minute': {
+        'task': 'trackerbalance.tasks.tracker_balance_of_addresses',
+        'schedule': timedelta(minutes=1)
+    },
+}

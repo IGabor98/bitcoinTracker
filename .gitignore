@@ -1,3 +1,4 @@
 .idea
-
-bitcoinTracker/.env
+.env
+celerybeat-schedule
+celeryev.pid
